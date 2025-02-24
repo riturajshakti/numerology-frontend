@@ -11,11 +11,21 @@ export default defineNuxtConfig({
       /* vuetify options */
     },
   },
+  ssr: true,
   runtimeConfig: {
     public: {
       backend: process.env.BACKEND,
-    }
+    },
   },
+  nitro: {
+    prerender: {
+      crawlLinks: true,
+      failOnError: false,
+    },
+  },
+  // experimental: {
+  //   renderJsonPayloads: true,
+  // },
   app: {
     head: {
       title: 'Numerology',
