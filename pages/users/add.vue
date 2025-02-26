@@ -1,11 +1,13 @@
 <script setup lang="ts">
 const name = ref('')
 const dob = ref('')
+const birthPlace = ref('')
+const address = ref('')
+const occupation = ref('')
+const email = ref('')
+const highestEducation = ref('')
 const phone = ref('')
-const vehicle = ref('')
-const account = ref('')
 const form = ref()
-const dobError = ref(false)
 
 onMounted(async () => {
   let token = localStorage.getItem('token')
@@ -17,14 +19,8 @@ onMounted(async () => {
 const backend = useRuntimeConfig().public.backend
 
 async function createUser() {
-  if(!dob.value) {
-    dobError.value = true;
-  }
   const { valid } = await form.value.validate()
   if (!valid) {
-    return
-  }
-  if(dobError.value) {
     return
   }
   const token = localStorage.getItem('token')
@@ -32,10 +28,13 @@ async function createUser() {
     method: 'POST',
     body: JSON.stringify({
       name: name.value,
-      dob: dob.value,
+      dob: dob.value + ':00',
+      birthPlace: birthPlace.value,
+      address: address.value,
+      occupation: occupation.value,
+      email: email.value,
+      highestEducation: highestEducation.value,
       phone: phone.value,
-      account: account.value,
-      vehicle: vehicle.value,
     }),
     headers: {
       'Content-Type': 'application/json',
@@ -43,7 +42,7 @@ async function createUser() {
     }
   })
   const json = await res.json()
-  if(!res.ok) {
+  if (!res.ok) {
     return alert('Error: ' + json.message)
   }
   navigateTo('/users')
@@ -67,21 +66,29 @@ async function createUser() {
 
     <v-card class="pa-8 mt-5" elevation="6">
       <v-form ref="form" class="mx-auto" style="max-width: 600px;">
-        <v-text-field v-model="name" density="compact" color="red" label="Name" placeholder="Enter name" variant="outlined"
-          :rules="[e => !!e || 'Name is required']" class="mb-1"></v-text-field>
+        <v-text-field v-model="name" density="compact" color="red" label="Name" placeholder="Enter name"
+          variant="outlined" :rules="[e => !!e || 'Name is required']" class="mb-1"></v-text-field>
 
-        <p class="fz-15 text-grey-darken-2">Date of birth</p>
-        <input v-model="dob" type="date" placeholder="Select DOB" class="bg-grey-lighten-3 w-100 h-3 pa-4" >
-        <p v-if="dobError" class="ps-4 text-red-darken-3 fz-17">Date of birth is required</p>
-        <div class="mb-5"></div>
+        <v-text-field v-model="dob" density="compact" color="red" label="Date of Birth"
+          placeholder="Enter date of birth" :rules="[e => !!e || 'DOB is required']" variant="outlined" class="mb-1"
+          type="datetime-local"></v-text-field>
+
+        <v-text-field v-model="birthPlace" density="compact" color="red" label="Birth Place"
+          placeholder="Enter birth place" variant="outlined" class="mb-1"></v-text-field>
+
+        <v-text-field v-model="address" density="compact" color="red" label="Address" placeholder="Enter address"
+          variant="outlined" class="mb-1"></v-text-field>
+
+        <v-text-field v-model="occupation" density="compact" color="red" label="Occupation"
+          placeholder="Enter occupation" variant="outlined" class="mb-1"></v-text-field>
+
+        <v-text-field v-model="email" density="compact" color="red" label="Email" placeholder="Enter email"
+          variant="outlined" class="mb-1"></v-text-field>
+
+        <v-text-field v-model="highestEducation" density="compact" color="red" label="Highest Education"
+          placeholder="Enter highest education" variant="outlined" class="mb-1"></v-text-field>
 
         <v-text-field v-model="phone" density="compact" color="red" label="Phone" placeholder="Enter phone"
-          variant="outlined" class="mb-1"></v-text-field>
-
-        <v-text-field v-model="vehicle" density="compact" color="red" label="Vehicle" placeholder="Enter vehicle"
-          variant="outlined" class="mb-1"></v-text-field>
-
-        <v-text-field v-model="account" density="compact" color="red" label="Account" placeholder="Enter account"
           variant="outlined" class="mb-1"></v-text-field>
 
         <div class="d-flex justify-end">

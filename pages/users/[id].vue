@@ -1,16 +1,19 @@
 <script setup lang="ts">
 const user = ref<User | undefined>()
 const form = ref()
-const dobError = ref(false)
 const route = useRoute()
 
 interface User {
   id: string
   name: string
   dob: string
+  birth_place?: string
+  address?: string
+  occupation?: string
+  email?: string
+  highest_education?: string
   phone?: string
-  vehicle?: string
-  account?: string
+  createdAt: number
 }
 
 onMounted(async () => {
@@ -35,13 +38,13 @@ async function fetchUser() {
     return
   }
   user.value = json.user
-  user.value!.dob = user.value!.dob.split('T')[0]
+  user.value!.dob = (user.value!.dob as string)
 }
 
 const backend = useRuntimeConfig().public.backend
 
 async function updateUser() {
-  if(!user.value) {
+  if (!user.value) {
     return
   }
   const { valid } = await form.value.validate()
@@ -53,10 +56,13 @@ async function updateUser() {
     method: 'PATCH',
     body: JSON.stringify({
       name: user.value.name,
-      dob: user.value.dob,
+      dob: user.value.dob.split('T')[1].length >= 8 ? user.value.dob : user.value.dob + ':00',
+      birthPlace: user.value.birth_place,
+      address: user.value.address,
+      occupation: user.value.occupation,
+      email: user.value.email,
+      highestEducation: user.value.highest_education,
       phone: user.value.phone,
-      account: user.value.account,
-      vehicle: user.value.vehicle,
     }),
     headers: {
       'Content-Type': 'application/json',
@@ -64,7 +70,7 @@ async function updateUser() {
     }
   })
   const json = await res.json()
-  if(!res.ok) {
+  if (!res.ok) {
     return alert('Error: ' + json.message)
   }
   navigateTo('/users')
@@ -88,21 +94,28 @@ async function updateUser() {
 
     <v-card class="pa-8 mt-5" elevation="6">
       <v-form v-if="user" ref="form" class="mx-auto" style="max-width: 600px;">
-        <v-text-field v-model="user.name" density="compact" color="red" label="Name" placeholder="Enter name" variant="outlined"
-          :rules="[e => !!e || 'Name is required']" class="mb-1"></v-text-field>
+        <v-text-field v-model="user.name" density="compact" color="red" label="Name" placeholder="Enter name"
+          variant="outlined" :rules="[e => !!e || 'Name is required']" class="mb-1"></v-text-field>
 
-        <p class="fz-15 text-grey-darken-2">Date of birth</p>
-        <input v-model="user.dob" type="date" placeholder="Select DOB" class="bg-grey-lighten-3 w-100 h-3 pa-4" >
-        <p v-if="dobError" class="ps-4 text-red-darken-3 fz-17">Date of birth is required</p>
-        <div class="mb-5"></div>
+        <v-text-field v-model="user.dob" :rules="[e => !!e || 'DOB is required']" density="compact" color="red" label="Date of Birth"
+          placeholder="Enter date of birth" variant="outlined" class="mb-1" type="datetime-local"></v-text-field>
+
+        <v-text-field v-model="user.birth_place" density="compact" color="red" label="Birth Place"
+          placeholder="Enter birth place" variant="outlined" class="mb-1"></v-text-field>
+
+        <v-text-field v-model="user.address" density="compact" color="red" label="Address" placeholder="Enter address"
+          variant="outlined" class="mb-1"></v-text-field>
+
+        <v-text-field v-model="user.occupation" density="compact" color="red" label="Occupation"
+          placeholder="Enter occupation" variant="outlined" class="mb-1"></v-text-field>
+
+        <v-text-field v-model="user.email" density="compact" color="red" label="Email" placeholder="Enter email"
+          variant="outlined" class="mb-1"></v-text-field>
+
+        <v-text-field v-model="user.highest_education" density="compact" color="red" label="Highest Education"
+          placeholder="Enter highest education" variant="outlined" class="mb-1"></v-text-field>
 
         <v-text-field v-model="user.phone" density="compact" color="red" label="Phone" placeholder="Enter phone"
-          variant="outlined" class="mb-1"></v-text-field>
-
-        <v-text-field v-model="user.vehicle" density="compact" color="red" label="Vehicle" placeholder="Enter vehicle"
-          variant="outlined" class="mb-1"></v-text-field>
-
-        <v-text-field v-model="user.account" density="compact" color="red" label="Account" placeholder="Enter account"
           variant="outlined" class="mb-1"></v-text-field>
 
         <div class="d-flex justify-end">

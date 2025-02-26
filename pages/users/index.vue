@@ -1,11 +1,17 @@
 <script setup lang="ts">
+import moment from 'moment'
+
 interface User {
   id: string
   name: string
   dob: string
+  birth_place?: string
+  address?: string
+  occupation?: string
+  email?: string
+  highest_education?: string
   phone?: string
-  vehicle?: string
-  account?: string
+  createdAt: number
 }
 
 const users = ref<User[]>([])
@@ -82,12 +88,16 @@ async function deleteUser(user: User) {
       <v-table class="mt-5">
         <thead>
           <tr>
-            <th class="text-left">Name</th>
-            <th class="text-left">DOB</th>
+            <th class="text-left" style="min-width: 180px;">Name</th>
+            <th class="text-left" style="min-width: 150px;">DOB</th>
+            <th class="text-left" style="min-width: 150px;">Birth Place</th>
+            <th class="text-left">Address</th>
+            <th class="text-left">Occupation</th>
+            <th class="text-left">Email</th>
+            <th class="text-left" style="min-width: 150px;">Highest Education</th>
             <th class="text-left">Phone</th>
-            <th class="text-left">Vehicle No</th>
-            <th class="text-left">Account No</th>
-            <th class="text-left">Actions</th>
+            <th class="text-left" style="min-width: 150px;">Created At</th>
+            <th class="text-left" style="min-width: 150px;">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -95,10 +105,14 @@ async function deleteUser(user: User) {
             <td>
               <NuxtLink :to="`/?name=${user.name}&dob=${dob2(user.dob)}`" class="fw-bold">{{ user.name }}</NuxtLink>
             </td>
-            <td>{{ dob(user.dob) }}</td>
+            <td>{{ moment(user.dob).format('DD MMMM YYYY, h:mm a') }}</td>
+            <td>{{ user.birth_place || '❌' }}</td>
+            <td>{{ user.address || '❌' }}</td>
+            <td>{{ user.occupation || '❌' }}</td>
+            <td>{{ user.email || '❌' }}</td>
+            <td>{{ user.highest_education || '❌' }}</td>
             <td>{{ user.phone || '❌' }}</td>
-            <td>{{ user.vehicle || '❌' }}</td>
-            <td>{{ user.account || '❌' }}</td>
+            <td>{{ moment(user.createdAt).format('DD MMMM YYYY, h:mm a') }}</td>
             <td>
               <v-btn icon="mdi-pencil" color="deep-orange" title="Edit" class="text-white me-2" size="x-small" @click="navigateTo(`/users/${user.id}`)"></v-btn>
               <v-btn icon="mdi-close" color="red" title="Delete" class="d-inline-flex align-center text-white"

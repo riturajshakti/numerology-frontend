@@ -42,29 +42,31 @@ function getNumerologyChart(dob: Date, date: Date) {
 
 	// ! antar dasha
 	// birth day + birth month + current year (last 2 digits) + day lord
-	// let dayLord = [1, 2, 9, 5, 3, 6, 8]
-	let dayLord = [7, 1, 2, 3, 4, 5, 6]
+	let dayLord = [1, 2, 9, 5, 3, 6, 8]
 	/**
 	 * @type {{start: Date; end: Date; value: number} | undefined}
 	 */
-	let antarDasha: MainData | undefined
-	// dob.getDate() + (dob.getMonth() + 1) + date.getFullYear() % 100 + dayLord[dob.getDay()]
-	// antarDasha = antarDasha.digit
+	let currentAntarDasha: MainData | undefined
+	let antarDasha: MainData[] = []
 	let startDate = new Date(dob)
 	while (startDate.getFullYear() < dob.getFullYear() + 100) {
 		let endDate = new Date(startDate)
 		endDate.setFullYear(endDate.getFullYear() + 1)
 		endDate.setDate(endDate.getDate() - 1)
-		if (date >= startDate && date <= endDate) {
-			let value = dob.getDate() + (dob.getMonth() + 1) + (startDate.getFullYear() % 100) + dayLord[startDate.getDay()]
-			value = value.digit
-			antarDasha = {
-				start: startDate,
-				end: endDate,
-				value
-			}
+		let value = dob.getDate() + (dob.getMonth() + 1) + (startDate.getFullYear() % 100) + dayLord[startDate.getDay()]
+		value = value.digit
+		let data: MainData = {
+			start: startDate,
+			end: endDate,
+			value
 		}
-		startDate = endDate
+		antarDasha.push(data)
+		if (date >= startDate && date <= endDate) {
+			data.current = true
+			currentAntarDasha = data
+		}
+		startDate = new Date(dob)
+		startDate.setFullYear(endDate.getFullYear())
 	}
 
 	// ! maha dasha
@@ -113,11 +115,11 @@ function getNumerologyChart(dob: Date, date: Date) {
    */
   let currentPd: PratyantarDashaData | undefined
 	const pdValue = (n: number) => Math.round(n * 8.11)
-	let pdDate = new Date(antarDasha!.start)
+	let pdDate = new Date(currentAntarDasha!.start)
 	let nextBirthday = new Date(pdDate)
 	nextBirthday.setFullYear(nextBirthday.getFullYear() + 1)
 	let pratyantarDasha = []
-	let pd = antarDasha!.value
+	let pd = currentAntarDasha!.value
 	while (pdDate <= nextBirthday) {
 		let backup = new Date(pdDate)
 		pdDate.setDate(pdDate.getDate() + pdValue(pd))
@@ -145,12 +147,14 @@ function getNumerologyChart(dob: Date, date: Date) {
 
 	// ! Grid
 	const position: Record<number, number> = { 3: 1, 1: 2, 9: 3, 6: 4, 7: 5, 5: 6, 2: 7, 8: 8, 4: 9 } as const
-	const grid: Record<number, string> = { 1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '', 8: '', 9: '' }
-	let gridUpdate = (digit: number) => {
+	const grid1: Record<number, string> = { 1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '', 8: '', 9: '' }
+	const grid2: Record<number, string> = { 1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '', 8: '', 9: '' }
+	let gridUpdate = (digit: number, grid: Record<number, string> = grid1) => {
 		if (digit > 0) {
 			grid[position[digit]] += digit
 		}
 	}
+	// setting DOB
 	let day = dob.getDate()
 	gridUpdate(Math.floor(day / 10))
 	gridUpdate(day % 10)
@@ -160,21 +164,23 @@ function getNumerologyChart(dob: Date, date: Date) {
 	let year = dob.getFullYear()
 	gridUpdate(Math.floor(year % 100 / 10))
 	gridUpdate(year % 10)
+
+	// setting other values
 	if (day > 10 && day % 10 !== 0) {
-		gridUpdate(basic)
+		gridUpdate(basic, grid2)
 	}
-	gridUpdate(destiny)
+	gridUpdate(destiny, grid2)
 	if (currentMahaDasha) {
-		gridUpdate(currentMahaDasha.value)
+		gridUpdate(currentMahaDasha.value, grid2)
 	}
-	if (antarDasha) {
-		gridUpdate(antarDasha.value)
+	if (currentAntarDasha) {
+		gridUpdate(currentAntarDasha.value, grid2)
 	}
   if(currentPd) {
-    gridUpdate(currentPd.pd)
+    gridUpdate(currentPd.pd, grid2)
   }
 
-	return { basic, destiny, currentMahaDasha, mahaDasha, antarDasha, currentPd, pratyantarDasha, grid }
+	return { basic, destiny, currentMahaDasha, mahaDasha, currentAntarDasha, antarDasha, currentPd, pratyantarDasha, grid1, grid2 }
 }
 
 export default getNumerologyChart;
