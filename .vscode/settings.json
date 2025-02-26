@@ -1,7 +1,13 @@
 {
   "workbench.colorCustomizations": {
-    "activityBar.background": "#01342E",
-    "titleBar.activeBackground": "#014940",
-    "titleBar.activeForeground": "#E9FFFC"
-  }
+    "activityBar.background": "#432619",
+    "titleBar.activeBackground": "#5E3623",
+    "titleBar.activeForeground": "#FCF9F7"
+  },
+  "cSpell.words": [
+    "antar",
+    "Dasha",
+    "Maha",
+    "pratyantar"
+  ]
 }

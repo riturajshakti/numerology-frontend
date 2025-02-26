@@ -3,8 +3,7 @@ import getNumerologyChart from './numerology';
 
 const name = ref('')
 const dob = ref('')
-const year = ref(new Date().getFullYear().toString())
-const dobError = ref(false)
+const date = ref(new Date().toISOString().split('T')[0])
 const form = ref()
 
 const route = useRoute()
@@ -16,17 +15,20 @@ onMounted(async () => {
     return navigateTo('/login')
   }
   name.value = (route.query.name as string | undefined) ?? ''
-  dob.value = (route.query.dob as string | undefined) ?? ''
+  dob.value = (route.query.dob as string | undefined) ?? '1996-01-10'
   chart.value = undefined
 })
 
 async function calculate() {
-  dobError.value = !dob.value
   const { valid } = await form.value.validate()
-  if (!valid || dobError.value) {
+  if (!valid) {
     return
   }
-  chart.value = getNumerologyChart(new Date(dob.value), +year.value)
+  chart.value = getNumerologyChart(new Date(dob.value), new Date(date.value))
+}
+
+function readable(date: Date): string {
+  return date.toLocaleDateString('en-GB')
 }
 </script>
 
@@ -38,15 +40,16 @@ async function calculate() {
       <h1>Numerology</h1>
     </div>
     <v-card shadow="xl" class="mt-5" elevation="6">
-      <v-form ref="form" class="mx-auto mt-5" style="max-width: 600px;">
+      <v-form ref="form" class="mx-auto mt-8" style="max-width: 600px;">
         <h2 v-if="name" class="mb-4">{{ name }}</h2>
-        <p class="fz-15 text-grey-darken-2">Date of birth</p>
-        <input v-model="dob" type="date" placeholder="Select DOB" class="bg-grey-lighten-3 w-100 h-3 pa-4">
-        <p v-if="dobError" class="ps-4 text-red-darken-3 fz-17">Date of birth is required</p>
-        <div class="mb-5"></div>
 
-        <v-text-field v-model="year" type="number" density="compact" color="red" label="Year" placeholder="Enter year"
-          variant="outlined" class="mb-1" :rules="[e => !!e || 'Year is required']"></v-text-field>
+        <v-text-field v-model="dob" label="Date of birth" placeholder="Enter date of birth"
+          :rules="[e => !!e || 'DOB is required']" variant="outlined" color="red" density="compact" class="mb-4"
+          type="date"></v-text-field>
+
+        <v-text-field v-model="date" label="Current Date" placeholder="Enter current date or inspection date"
+          :rules="[e => !!e || 'Date is required']" variant="outlined" color="red" density="compact" class="mb-4"
+          type="date"></v-text-field>
 
         <div class="d-flex justify-end">
           <v-btn class="bg-red text-white px-10" @click="calculate">calculate</v-btn>
@@ -60,23 +63,63 @@ async function calculate() {
       <h2 class="mb-4">Chart</h2>
 
       <div class="grid">
-        <div class="cell">{{chart.grid[1]}}</div>
-        <div class="cell">{{chart.grid[2]}}</div>
-        <div class="cell">{{chart.grid[3]}}</div>
-        <div class="cell">{{chart.grid[4]}}</div>
-        <div class="cell">{{chart.grid[5]}}</div>
-        <div class="cell">{{chart.grid[6]}}</div>
-        <div class="cell">{{chart.grid[7]}}</div>
-        <div class="cell">{{chart.grid[8]}}</div>
-        <div class="cell">{{chart.grid[9]}}</div>
+        <div class="cell">{{ chart.grid[1] }}</div>
+        <div class="cell">{{ chart.grid[2] }}</div>
+        <div class="cell">{{ chart.grid[3] }}</div>
+        <div class="cell">{{ chart.grid[4] }}</div>
+        <div class="cell">{{ chart.grid[5] }}</div>
+        <div class="cell">{{ chart.grid[6] }}</div>
+        <div class="cell">{{ chart.grid[7] }}</div>
+        <div class="cell">{{ chart.grid[8] }}</div>
+        <div class="cell">{{ chart.grid[9] }}</div>
       </div>
 
       <p><b>Basic:</b> {{ chart.basic }}</p> <br>
       <p><b>Destiny:</b> {{ chart.destiny }}</p> <br>
-      <p><b>Antar Dasha:</b> {{ chart.antarDasha }}</p> <br>
-      <p><b>Maha Dasha:</b> {{ chart.mahaDasha.join(', ') }}</p>
 
-      <h4 class="mt-5"><b>Pratyantar Dasha:</b></h4>
+      <p><b>Maha Dasha:</b>
+        {{ readable(chart.currentMahaDasha.start) }}
+        -
+        {{ readable(chart.currentMahaDasha.end) }},
+        <b>Value:</b> {{ chart.currentMahaDasha.value }}
+      </p> <br>
+
+      <p><b>Antar Dasha:</b>
+        {{ readable(chart.antarDasha.start) }}
+        -
+        {{ readable(chart.antarDasha.end) }},
+        <b>Value:</b> {{ chart.antarDasha.value }}
+      </p> <br>
+
+      <p><b>Pratyantar Dasha:</b>
+        {{ readable(chart.currentPd.start) }}
+        -
+        {{ readable(chart.currentPd.end) }},
+        <b>Value:</b> {{ chart.currentPd.pd }}, 
+        <b>Difference:</b> {{ chart.currentPd.pdValue }}
+      </p> <br>
+
+      <h4 class="mt-5"><b>Maha Dasha List:</b></h4>
+      <v-table style="max-width: 500px;">
+        <caption>
+        </caption>
+        <thead>
+          <tr>
+            <th class="text-left">Start</th>
+            <th class="text-left">End</th>
+            <th class="text-left">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="md of chart.mahaDasha" :class="{current: md.current}">
+            <td>{{ md.start.toLocaleDateString("en-GB") }}</td>
+            <td>{{ md.end.toLocaleDateString("en-GB") }}</td>
+            <td>{{ md.value }}</td>
+          </tr>
+        </tbody>
+      </v-table>
+
+      <h4 class="mt-5"><b>Pratyantar Dasha List:</b></h4>
       <v-table style="max-width: 600px;">
         <caption>
         </caption>
@@ -89,7 +132,7 @@ async function calculate() {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="pd of chart.pryantyarDasha">
+          <tr v-for="pd of chart.pratyantarDasha" :class="{current: pd.current}">
             <td>{{ pd.start.toLocaleDateString("en-GB") }}</td>
             <td>{{ pd.end.toLocaleDateString("en-GB") }}</td>
             <td>{{ pd.pd }}</td>
@@ -139,5 +182,9 @@ async function calculate() {
 th {
   font-weight: bold !important;
   text-transform: uppercase;
+}
+
+.current {
+  background-color: rgb(255, 227, 227);
 }
 </style>
