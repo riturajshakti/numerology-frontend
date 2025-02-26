@@ -15,7 +15,7 @@ onMounted(async () => {
     return navigateTo('/login')
   }
   name.value = (route.query.name as string | undefined) ?? ''
-  dob.value = (route.query.dob as string | undefined) ?? '2002-10-24'
+  dob.value = (route.query.dob as string | undefined) ?? ''
   chart.value = undefined
 })
 
