@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const name = ref('')
-const dob = ref('')
 const birthPlace = ref('')
 const address = ref('')
 const occupation = ref('')
@@ -8,6 +7,13 @@ const email = ref('')
 const highestEducation = ref('')
 const phone = ref('')
 const form = ref()
+
+const dobDay = ref('')
+const dobMonth = ref('')
+const dobYear = ref('')
+const dobHour = ref('')
+const dobMinute = ref('')
+const dobSecond = ref('')
 
 onMounted(async () => {
   let token = localStorage.getItem('token')
@@ -28,7 +34,7 @@ async function createUser() {
     method: 'POST',
     body: JSON.stringify({
       name: name.value,
-      dob: dob.value + ':00',
+      dob: `${dobYear.value}-${dobMonth.value.toString().padStart(2, '0')}-${dobDay.value.toString().padStart(2, '0')}T${dobHour.value.toString().padStart(2, '0')}:${dobMinute.value.toString().padStart(2, '0')}:${dobSecond.value.toString().padStart(2, '0')}`,
       birthPlace: birthPlace.value,
       address: address.value,
       occupation: occupation.value,
@@ -69,9 +75,31 @@ async function createUser() {
         <v-text-field v-model="name" density="compact" color="red" label="Name" placeholder="Enter name"
           variant="outlined" :rules="[e => !!e || 'Name is required']" class="mb-1"></v-text-field>
 
-        <v-text-field v-model="dob" density="compact" color="red" label="Date of Birth"
-          placeholder="Enter date of birth" :rules="[e => !!e || 'DOB is required']" variant="outlined" class="mb-1"
-          type="datetime-local"></v-text-field>
+          <p class="mb-2">Date of birth:</p>
+        <div class="d-flex">
+          <v-text-field v-model="dobDay" label="Day" placeholder="Day" :rules="[e => !!e || 'Day is required']"
+            variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
+
+          <v-text-field v-model="dobMonth" label="Month" placeholder="Month" :rules="[e => !!e || 'Month is required']"
+            variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
+
+          <v-text-field v-model="dobYear" label="Year" placeholder="Year" :rules="[e => !!e || 'Year is required',  e => +e <= new Date().getFullYear() || 'Can\'t be future year']"
+            variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
+        </div>
+
+        <p class="mb-2">Time of birth:</p>
+        <div class="d-flex">
+          <v-text-field v-model="dobHour" label="Hour" placeholder="Hour" :rules="[e => !!e || 'Hour is required']"
+            variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
+
+          <v-text-field v-model="dobMinute" label="Minute" placeholder="Minute"
+            :rules="[e => !!e || 'Minute is required']" variant="outlined" color="red" density="compact"
+            class="mb-4 d-inline-block" type="number"></v-text-field>
+
+          <v-text-field v-model="dobSecond" label="Second" placeholder="Second"
+            :rules="[e => !!e || 'Second is required']" variant="outlined" color="red" density="compact"
+            class="mb-4 d-inline-block" type="number"></v-text-field>
+        </div>
 
         <v-text-field v-model="birthPlace" density="compact" color="red" label="Birth Place"
           placeholder="Enter birth place" variant="outlined" class="mb-1"></v-text-field>

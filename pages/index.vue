@@ -2,8 +2,18 @@
 import getNumerologyChart from './numerology';
 
 const name = ref('')
-const dob = ref('')
-const date = ref(new Date().toISOString().split('T')[0])
+
+const dobDay = ref('')
+const dobMonth = ref('')
+const dobYear = ref('')
+const dob = computed(() => `${dobYear.value}-${dobMonth.value.toString().padStart(2, '0')}-${dobDay.value.toString().padStart(2, '0')}`)
+
+const now = new Date().toISOString().split('T')[0].split('-')
+const dateDay = ref(now[2])
+const dateMonth = ref(now[1])
+const dateYear = ref(now[0])
+const date = computed(() => `${dateYear.value}-${dateMonth.value.toString().padStart(2, '0')}-${dateDay.value.toString().padStart(2, '0')}`)
+
 const form = ref()
 
 const route = useRoute()
@@ -15,16 +25,26 @@ onMounted(async () => {
     return navigateTo('/login')
   }
   name.value = (route.query.name as string | undefined) ?? ''
-  dob.value = (route.query.dob as string | undefined) ?? ''
   chart.value = undefined
+  if(route.query.dob) {
+    const [year, month, day] = (route.query.dob as string).split('-')
+    dobYear.value = year
+    dobMonth.value = month
+    dobDay.value = day
+  }
 })
 
 async function calculate() {
-  const { valid } = await form.value.validate()
-  if (!valid) {
-    return
+  try {
+    const { valid } = await form.value.validate()
+    if (!valid) {
+      return
+    }
+    chart.value = getNumerologyChart(new Date(dob.value), new Date(date.value))
+  } catch (error) {
+    console.error(error)
+    alert('Error: some unknown error occurred')
   }
-  chart.value = getNumerologyChart(new Date(dob.value), new Date(date.value))
 }
 
 function readable(date: Date): string {
@@ -43,13 +63,29 @@ function readable(date: Date): string {
       <v-form ref="form" class="mx-auto mt-8 pa-4" style="max-width: 600px;">
         <h2 v-if="name" class="mb-4">{{ name }}</h2>
 
-        <v-text-field v-model="dob" label="Date of birth" placeholder="Enter date of birth"
-          :rules="[e => !!e || 'DOB is required']" variant="outlined" color="red" density="compact" class="mb-4"
-          type="date"></v-text-field>
+        <p class="mb-2">Date of birth:</p>
+        <div class="d-flex">
+          <v-text-field v-model="dobDay" label="Day" placeholder="Day"
+          :rules="[e => !!e || 'Day is required']" variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
 
-        <v-text-field v-model="date" label="Current Date" placeholder="Enter current date or inspection date"
-          :rules="[e => !!e || 'Date is required']" variant="outlined" color="red" density="compact" class="mb-4"
-          type="date"></v-text-field>
+          <v-text-field v-model="dobMonth" label="Month" placeholder="Month"
+          :rules="[e => !!e || 'Month is required']" variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
+
+          <v-text-field v-model="dobYear" label="Year" placeholder="Year"
+          :rules="[e => !!e || 'Year is required',  e => +e <= new Date().getFullYear() || 'Can\'t be future year']" variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
+        </div>
+
+        <p class="mt-0 mb-2">Date:</p>
+        <div class="d-flex">
+          <v-text-field v-model="dateDay" label="Day" placeholder="Day"
+          :rules="[e => !!e || 'Day is required']" variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
+
+          <v-text-field v-model="dateMonth" label="Month" placeholder="Month"
+          :rules="[e => !!e || 'Month is required']" variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
+
+          <v-text-field v-model="dateYear" label="Year" placeholder="Year"
+          :rules="[e => !!e || 'Year is required']" variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
+        </div>
 
         <div class="d-flex justify-end">
           <v-btn class="bg-red text-white px-10" @click="calculate">calculate</v-btn>

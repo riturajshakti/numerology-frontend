@@ -3,6 +3,13 @@ const user = ref<User | undefined>()
 const form = ref()
 const route = useRoute()
 
+const dobDay = ref('')
+const dobMonth = ref('')
+const dobYear = ref('')
+const dobHour = ref('')
+const dobMinute = ref('')
+const dobSecond = ref('')
+
 interface User {
   id: string
   name: string
@@ -39,6 +46,13 @@ async function fetchUser() {
   }
   user.value = json.user
   user.value!.dob = (user.value!.dob as string)
+  let dob = user.value!.dob
+  dobYear.value = dob.split('T')[0].split('-')[0]
+  dobMonth.value = dob.split('T')[0].split('-')[1]
+  dobDay.value = dob.split('T')[0].split('-')[2]
+  dobHour.value = dob.split('T')[1].split(':')[0]
+  dobMinute.value = dob.split('T')[1].split(':')[1]
+  dobSecond.value = dob.split('T')[1].split(':')[2]
 }
 
 const backend = useRuntimeConfig().public.backend
@@ -56,7 +70,7 @@ async function updateUser() {
     method: 'PATCH',
     body: JSON.stringify({
       name: user.value.name,
-      dob: user.value.dob.split('T')[1].length >= 8 ? user.value.dob : user.value.dob + ':00',
+      dob: `${dobYear.value}-${dobMonth.value.toString().padStart(2, '0')}-${dobDay.value.toString().padStart(2, '0')}T${dobHour.value.toString().padStart(2, '0')}:${dobMinute.value.toString().padStart(2, '0')}:${dobSecond.value.toString().padStart(2, '0')}`,
       birthPlace: user.value.birth_place,
       address: user.value.address,
       occupation: user.value.occupation,
@@ -97,8 +111,31 @@ async function updateUser() {
         <v-text-field v-model="user.name" density="compact" color="red" label="Name" placeholder="Enter name"
           variant="outlined" :rules="[e => !!e || 'Name is required']" class="mb-1"></v-text-field>
 
-        <v-text-field v-model="user.dob" :rules="[e => !!e || 'DOB is required']" density="compact" color="red" label="Date of Birth"
-          placeholder="Enter date of birth" variant="outlined" class="mb-1" type="datetime-local"></v-text-field>
+        <p class="mb-2">Date of birth:</p>
+        <div class="d-flex">
+          <v-text-field v-model="dobDay" label="Day" placeholder="Day" :rules="[e => !!e || 'Day is required']"
+            variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
+
+          <v-text-field v-model="dobMonth" label="Month" placeholder="Month" :rules="[e => !!e || 'Month is required']"
+            variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
+
+          <v-text-field v-model="dobYear" label="Year" placeholder="Year" :rules="[e => !!e || 'Year is required',  e => +e <= new Date().getFullYear() || 'Can\'t be future year']"
+            variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
+        </div>
+
+        <p class="mb-2">Time of birth:</p>
+        <div class="d-flex">
+          <v-text-field v-model="dobHour" label="Hour" placeholder="Hour" :rules="[e => !!e || 'Hour is required']"
+            variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
+
+          <v-text-field v-model="dobMinute" label="Minute" placeholder="Minute"
+            :rules="[e => !!e || 'Minute is required']" variant="outlined" color="red" density="compact"
+            class="mb-4 d-inline-block" type="number"></v-text-field>
+
+          <v-text-field v-model="dobSecond" label="Second" placeholder="Second"
+            :rules="[e => !!e || 'Second is required']" variant="outlined" color="red" density="compact"
+            class="mb-4 d-inline-block" type="number"></v-text-field>
+        </div>
 
         <v-text-field v-model="user.birth_place" density="compact" color="red" label="Birth Place"
           placeholder="Enter birth place" variant="outlined" class="mb-1"></v-text-field>
