@@ -3,9 +3,9 @@ import getNumerologyChart from './numerology';
 
 const name = ref('')
 
-const dobDay = ref('23')
-const dobMonth = ref('4')
-const dobYear = ref('1998')
+const dobDay = ref('')
+const dobMonth = ref('')
+const dobYear = ref('')
 const dob = computed(() => `${dobYear.value}-${dobMonth.value.toString().padStart(2, '0')}-${dobDay.value.toString().padStart(2, '0')}`)
 
 const now = new Date().toISOString().split('T')[0].split('-')
