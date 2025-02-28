@@ -126,6 +126,7 @@ function getNumerologyChart(dob: Date, date: Date) {
 		if (pdDate <= nextBirthday) {
       let start = backup
       let end = new Date(pdDate)
+			end.setDate(end.getDate() - 1)
       let data: PratyantarDashaData = {
 				start,
 				end,
@@ -191,6 +192,6 @@ function getNumerologyChart(dob: Date, date: Date) {
 
 export default getNumerologyChart;
 
-// console.log(getNumerologyChart(new Date(1996, 0, 10), 2025)) // 10/01/1996, 2025
+// console.log(getNumerologyChart(new Date(1996, 0, 10), new Date(2025, 1, 28))) // 10/01/1996, 2025
 // console.log(getNumerologyChart(new Date(2002, 9, 24), 2025)) // 24/10/2002, 2025
 // console.log(getNumerologyChart(new Date(1945, 11, 23), 2025)) // 23/12/1945, 2025

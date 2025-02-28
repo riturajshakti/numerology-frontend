@@ -41,6 +41,7 @@ async function calculate() {
       return
     }
     chart.value = getNumerologyChart(new Date(dob.value), new Date(date.value))
+    console.log(chart.value)
   } catch (error) {
     console.error(error)
     alert('Error: some unknown error occurred')
