@@ -3,9 +3,9 @@ import getNumerologyChart from './numerology';
 
 const name = ref('')
 
-const dobDay = ref('')
-const dobMonth = ref('')
-const dobYear = ref('')
+const dobDay = ref('23')
+const dobMonth = ref('4')
+const dobYear = ref('1998')
 const dob = computed(() => `${dobYear.value}-${dobMonth.value.toString().padStart(2, '0')}-${dobDay.value.toString().padStart(2, '0')}`)
 
 const now = new Date().toISOString().split('T')[0].split('-')
@@ -111,43 +111,43 @@ function readable(date: Date): string {
             <div class="cell">{{ chart.grid1[8] }}</div>
             <div class="cell">{{ chart.grid1[9] }}</div>
           </div>
-          <p class="text-center">Date of birth</p>
+          <p class="text-center grid-title fw-semibold">DOB, Basic & Destiny</p>
         </v-col>
 
         <v-col cols="12" md="6">
           <div class="grid">
-            <div class="cell">{{ chart.grid2[1] }}</div>
-            <div class="cell">{{ chart.grid2[2] }}</div>
-            <div class="cell">{{ chart.grid2[3] }}</div>
-            <div class="cell">{{ chart.grid2[4] }}</div>
-            <div class="cell">{{ chart.grid2[5] }}</div>
-            <div class="cell">{{ chart.grid2[6] }}</div>
-            <div class="cell">{{ chart.grid2[7] }}</div>
-            <div class="cell">{{ chart.grid2[8] }}</div>
-            <div class="cell">{{ chart.grid2[9] }}</div>
+            <div class="cell" v-html="chart.grid2[1]"></div>
+            <div class="cell" v-html="chart.grid2[2]"></div>
+            <div class="cell" v-html="chart.grid2[3]"></div>
+            <div class="cell" v-html="chart.grid2[4]"></div>
+            <div class="cell" v-html="chart.grid2[5]"></div>
+            <div class="cell" v-html="chart.grid2[6]"></div>
+            <div class="cell" v-html="chart.grid2[7]"></div>
+            <div class="cell" v-html="chart.grid2[8]"></div>
+            <div class="cell" v-html="chart.grid2[9]"></div>
           </div>
-          <p class="text-center">Other Values</p>
+          <p class="text-center grid-title fw-semibold">MD, AD & PD</p>
         </v-col>
       </v-row>
 
-      <p><b>Basic:</b> {{ chart.basic }}</p> <br>
-      <p><b>Destiny:</b> {{ chart.destiny }}</p> <br>
+      <p class="grid-title"><b>Basic:</b> {{ chart.basic }}</p> <br>
+      <p class="grid-title"><b>Destiny:</b> {{ chart.destiny }}</p> <br>
 
-      <p><b>Maha Dasha:</b>
+      <p class="maha-dasha-text"><b>Maha Dasha:</b>
         {{ readable(chart.currentMahaDasha!.start) }}
         -
         {{ readable(chart.currentMahaDasha!.end) }},
         <b>Value:</b> {{ chart.currentMahaDasha!.value }}
       </p> <br>
 
-      <p><b>Antar Dasha:</b>
+      <p class="antar-dasha-text"><b>Antar Dasha:</b>
         {{ readable(chart.currentAntarDasha!.start) }}
         -
         {{ readable(chart.currentAntarDasha!.end) }},
         <b>Value:</b> {{ chart.currentAntarDasha!.value }}
       </p> <br>
 
-      <p><b>Pratyantar Dasha:</b>
+      <p class="pratyantar-dasha-text"><b>Pratyantar Dasha:</b>
         {{ readable(chart.currentPd!.start) }}
         -
         {{ readable(chart.currentPd!.end) }},
@@ -158,11 +158,9 @@ function readable(date: Date): string {
       <v-expansion-panels multiple>
         <!-- Maha Dasha -->
         <v-expansion-panel>
-          <v-expansion-panel-title><b>Maha Dasha List:</b></v-expansion-panel-title>
+          <v-expansion-panel-title class="maha-dasha"><b>Maha Dasha List:</b></v-expansion-panel-title>
           <v-expansion-panel-text>
-            <v-table style="max-width: 500px;" density="compact">
-              <caption>
-              </caption>
+            <v-table style="max-width: 500px;" density="compact" class="maha-dasha">
               <thead>
                 <tr>
                   <th class="text-left">Start</th>
@@ -171,7 +169,7 @@ function readable(date: Date): string {
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="md of chart.mahaDasha" :class="{ current: md.current }">
+                <tr v-for="md of chart.mahaDasha" :class="{ 'current-md': md.current }">
                   <td>{{ md.start.toLocaleDateString("en-GB") }}</td>
                   <td>{{ md.end.toLocaleDateString("en-GB") }}</td>
                   <td>{{ md.value }}</td>
@@ -183,11 +181,9 @@ function readable(date: Date): string {
 
         <!-- Antar Dasha -->
         <v-expansion-panel>
-          <v-expansion-panel-title><b>Antar Dasha List:</b></v-expansion-panel-title>
+          <v-expansion-panel-title class="antar-dasha"><b>Antar Dasha List:</b></v-expansion-panel-title>
           <v-expansion-panel-text>
-            <v-table style="max-width: 500px;" density="compact">
-              <caption>
-              </caption>
+            <v-table style="max-width: 500px;" density="compact" class="antar-dasha">
               <thead>
                 <tr>
                   <th class="text-left">Start</th>
@@ -196,7 +192,7 @@ function readable(date: Date): string {
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="ad of chart.antarDasha" :class="{ current: ad.current }">
+                <tr v-for="ad of chart.antarDasha" :class="{ 'current-ad': ad.current }">
                   <td>{{ ad.start.toLocaleDateString("en-GB") }}</td>
                   <td>{{ ad.end.toLocaleDateString("en-GB") }}</td>
                   <td>{{ ad.value }}</td>
@@ -208,11 +204,9 @@ function readable(date: Date): string {
 
         <!-- Pratyantar Dasha -->
         <v-expansion-panel>
-          <v-expansion-panel-title><b>Pratyantar Dasha List:</b></v-expansion-panel-title>
+          <v-expansion-panel-title class="pratyantar-dasha"><b>Pratyantar Dasha List:</b></v-expansion-panel-title>
           <v-expansion-panel-text>
-            <v-table style="max-width: 600px;" density="compact">
-              <caption>
-              </caption>
+            <v-table style="max-width: 600px;" density="compact" class="pratyantar-dasha">
               <thead>
                 <tr>
                   <th class="text-left">Start</th>
@@ -222,7 +216,7 @@ function readable(date: Date): string {
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="pd of chart.pratyantarDasha" :class="{ current: pd.current }">
+                <tr v-for="pd of chart.pratyantarDasha" :class="{ 'current-pd': pd.current }">
                   <td>{{ pd.start.toLocaleDateString("en-GB") }}</td>
                   <td>{{ pd.end.toLocaleDateString("en-GB") }}</td>
                   <td>{{ pd.pd }}</td>
@@ -256,7 +250,7 @@ function readable(date: Date): string {
   gap: 0;
   width: 305px;
   margin: 10px auto;
-  border: 3px solid black;
+  border: 3px solid #e9a200;
 }
 
 .cell {
@@ -266,10 +260,12 @@ function readable(date: Date): string {
   font-size: 24px;
   font-weight: bold;
   background-color: white;
-  border: 2px solid black;
+  border: 2px solid #e9a200;
   color: black;
   width: 100px;
   height: 100px;
+  background-color: #800020;
+  color: #e9a200;
 }
 
 th {
@@ -277,7 +273,49 @@ th {
   text-transform: uppercase;
 }
 
-.current {
-  background-color: rgb(255, 227, 227);
+.current-md {
+  background-color: #efd1ff;
+  color: black;
+}
+
+.current-ad {
+  background-color: #ffe1cd;
+  color: black;
+}
+
+.current-pd {
+  background-color: #d2f1ff;
+  color: black;
+}
+
+.grid-title {
+  color: #800020;
+}
+
+.maha-dasha {
+  background-color: #5c038c;
+  color: white;
+}
+
+.antar-dasha {
+  background-color: #f2670d;
+  color: white;
+}
+
+.pratyantar-dasha {
+  background-color: #598da6;
+  color: white;
+}
+
+.maha-dasha-text {
+  color: #5c038c;
+}
+
+.antar-dasha-text {
+  color: #f2670d;
+}
+
+.pratyantar-dasha-text {
+  color: #598da6;
 }
 </style>

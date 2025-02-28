@@ -149,12 +149,18 @@ function getNumerologyChart(dob: Date, date: Date) {
 	const position: Record<number, number> = { 3: 1, 1: 2, 9: 3, 6: 4, 7: 5, 5: 6, 2: 7, 8: 8, 4: 9 } as const
 	const grid1: Record<number, string> = { 1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '', 8: '', 9: '' }
 	const grid2: Record<number, string> = { 1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '', 8: '', 9: '' }
-	let gridUpdate = (digit: number, grid: Record<number, string> = grid1) => {
+	let gridUpdate = (digit: number, grid: Record<number, string> = grid1, color?: string) => {
+		if(color) {
+			if (digit > 0) {
+				grid[position[digit]] += `<span style="color: ${color};">${digit}</span>`
+			}
+			return
+		}
 		if (digit > 0) {
 			grid[position[digit]] += digit
 		}
 	}
-	// setting DOB
+	// setting DOB, basic and destiny
 	let day = dob.getDate()
 	gridUpdate(Math.floor(day / 10))
 	gridUpdate(day % 10)
@@ -164,20 +170,20 @@ function getNumerologyChart(dob: Date, date: Date) {
 	let year = dob.getFullYear()
 	gridUpdate(Math.floor(year % 100 / 10))
 	gridUpdate(year % 10)
+	if (day > 10 && day % 10 !== 0) {
+		gridUpdate(basic)
+	}
+	gridUpdate(destiny)
 
 	// setting other values
-	if (day > 10 && day % 10 !== 0) {
-		gridUpdate(basic, grid2)
-	}
-	gridUpdate(destiny, grid2)
 	if (currentMahaDasha) {
-		gridUpdate(currentMahaDasha.value, grid2)
+		gridUpdate(currentMahaDasha.value, grid2, '#5c038c')
 	}
 	if (currentAntarDasha) {
-		gridUpdate(currentAntarDasha.value, grid2)
+		gridUpdate(currentAntarDasha.value, grid2, '#f2670d')
 	}
   if(currentPd) {
-    gridUpdate(currentPd.pd, grid2)
+    gridUpdate(currentPd.pd, grid2, '#598da6')
   }
 
 	return { basic, destiny, currentMahaDasha, mahaDasha, currentAntarDasha, antarDasha, currentPd, pratyantarDasha, grid1, grid2 }
