@@ -33,11 +33,11 @@ interface PratyantarDashaData {
  */
 function getNumerologyChart(dob: Date, date: Date) {
 	// ! basic
-	let basic = dob.getUTCDate().digit
+	let basic = dob.getDate().digit
 
 	// ! destiny
 	// birth day + birth month + birth year
-	let destiny = dob.getUTCDate().sum + (dob.getUTCMonth() + 1).sum + dob.getUTCFullYear().sum
+	let destiny = dob.getDate().sum + (dob.getMonth() + 1).sum + dob.getFullYear().sum
 	destiny = destiny.digit
 
 	// ! antar dasha
@@ -49,11 +49,11 @@ function getNumerologyChart(dob: Date, date: Date) {
 	let currentAntarDasha: MainData | undefined
 	let antarDasha: MainData[] = []
 	let startDate = new Date(dob)
-	while (startDate.getUTCFullYear() < dob.getUTCFullYear() + 100) {
+	while (startDate.getFullYear() < dob.getFullYear() + 100) {
 		let endDate = new Date(startDate)
-		endDate.setUTCFullYear(endDate.getUTCFullYear() + 1)
-		endDate.setUTCDate(endDate.getDate() - 1)
-		let value = dob.getUTCDate() + (dob.getUTCMonth() + 1) + (startDate.getUTCFullYear() % 100) + dayLord[startDate.getUTCDay()]
+		endDate.setFullYear(endDate.getFullYear() + 1)
+		endDate.setDate(endDate.getDate() - 1)
+		let value = dob.getDate() + (dob.getMonth() + 1) + (startDate.getFullYear() % 100) + dayLord[startDate.getDay()]
 		value = value.digit
 		let data: MainData = {
 			start: startDate,
@@ -66,7 +66,7 @@ function getNumerologyChart(dob: Date, date: Date) {
 			currentAntarDasha = data
 		}
 		startDate = new Date(dob)
-		startDate.setUTCFullYear(endDate.getUTCFullYear())
+		startDate.setFullYear(endDate.getFullYear())
 	}
 
 	// ! maha dasha
@@ -85,12 +85,12 @@ function getNumerologyChart(dob: Date, date: Date) {
 	 */
 	let currentMahaDasha: MainData | undefined
 	let count = basic
-	let start = dob.getUTCFullYear()
-	while (dob.getUTCFullYear() + 100 >= start) {
+	let start = dob.getFullYear()
+	while (dob.getFullYear() + 100 >= start) {
 		let end = start + count
-		let startDate = new Date(start, dob.getUTCMonth(), dob.getUTCDate())
-		let endDate = new Date(end, dob.getUTCMonth(), dob.getUTCDate())
-		endDate.setUTCDate(endDate.getUTCDate() - 1)
+		let startDate = new Date(start, dob.getMonth(), dob.getDate())
+		let endDate = new Date(end, dob.getMonth(), dob.getDate())
+		endDate.setDate(endDate.getDate() - 1)
 		let data: MainData = {
 			start: startDate,
 			end: endDate,
@@ -117,16 +117,16 @@ function getNumerologyChart(dob: Date, date: Date) {
 	const pdValue = (n: number) => Math.round(n * 8.11)
 	let pdDate = new Date(currentAntarDasha!.start)
 	let nextBirthday = new Date(pdDate)
-	nextBirthday.setUTCFullYear(nextBirthday.getUTCFullYear() + 1)
+	nextBirthday.setFullYear(nextBirthday.getFullYear() + 1)
 	let pratyantarDasha = []
 	let pd = currentAntarDasha!.value
 	while (pdDate <= nextBirthday) {
 		let backup = new Date(pdDate)
-		pdDate.setUTCDate(pdDate.getUTCDate() + pdValue(pd))
+		pdDate.setDate(pdDate.getDate() + pdValue(pd))
 		if (pdDate <= nextBirthday) {
       let start = backup
       let end = new Date(pdDate)
-			end.setUTCDate(end.getUTCDate() - 1)
+			end.setDate(end.getDate() - 1)
       let data: PratyantarDashaData = {
 				start,
 				end,
@@ -162,13 +162,13 @@ function getNumerologyChart(dob: Date, date: Date) {
 		}
 	}
 	// setting DOB, basic and destiny
-	let day = dob.getUTCDate()
+	let day = dob.getDate()
 	gridUpdate(Math.floor(day / 10))
 	gridUpdate(day % 10)
-	let month = dob.getUTCMonth() + 1
+	let month = dob.getMonth() + 1
 	gridUpdate(Math.floor(month / 10))
 	gridUpdate(month % 10)
-	let year = dob.getUTCFullYear()
+	let year = dob.getFullYear()
 	gridUpdate(Math.floor(year % 100 / 10))
 	gridUpdate(year % 10)
 	if (day > 10 && day % 10 !== 0) {

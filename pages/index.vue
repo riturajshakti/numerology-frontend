@@ -6,13 +6,13 @@ const name = ref('')
 const dobDay = ref('')
 const dobMonth = ref('')
 const dobYear = ref('')
-const dob = computed(() => `${dobYear.value}-${dobMonth.value.toString().padStart(2, '0')}-${dobDay.value.toString().padStart(2, '0')}`)
+const dob = computed(() => `${dobYear.value}-${dobMonth.value.toString().padStart(2, '0')}-${dobDay.value.toString().padStart(2, '0')}T00:00:00Z`)
 
 const now = new Date().toISOString().split('T')[0].split('-')
 const dateDay = ref(now[2])
 const dateMonth = ref(now[1])
 const dateYear = ref(now[0])
-const date = computed(() => `${dateYear.value}-${dateMonth.value.toString().padStart(2, '0')}-${dateDay.value.toString().padStart(2, '0')}`)
+const date = computed(() => `${dateYear.value}-${dateMonth.value.toString().padStart(2, '0')}-${dateDay.value.toString().padStart(2, '0')}T00:00:00Z`)
 
 const form = ref()
 
