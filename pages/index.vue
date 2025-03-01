@@ -251,7 +251,7 @@ function readable(date: Date): string {
   gap: 0;
   width: 305px;
   margin: 10px auto;
-  border: 3px solid #e9a200;
+  border: 3px solid #800020;
 }
 
 .cell {
@@ -261,11 +261,10 @@ function readable(date: Date): string {
   font-size: 24px;
   font-weight: bold;
   background-color: white;
-  border: 2px solid #e9a200;
+  border: 2px solid #800020;
   color: black;
   width: 100px;
   height: 100px;
-  background-color: #800020;
   color: #e9a200;
 }
 
