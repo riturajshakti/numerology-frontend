@@ -3,19 +3,21 @@ import definitions from './definitions'
 const {} = definitions
 
 interface MainData {
-  start: Date
-  end: Date
-  value: number
-  current?: true
+	start: Date
+	end: Date
+	value: number
+	current?: true
 }
 
 interface PratyantarDashaData {
-  start: Date
-  end: Date
-  pd: number
-  pdValue: number
-  current?: true
+	start: Date
+	end: Date
+	pd: number
+	pdValue: number
+	current?: true
 }
+
+const MAX_YEAR = 100
 
 /**
  *
@@ -49,11 +51,12 @@ function getNumerologyChart(dob: Date, date: Date) {
 	let currentAntarDasha: MainData | undefined
 	let antarDasha: MainData[] = []
 	let startDate = new Date(dob)
-	while (startDate.getUTCFullYear() < dob.getUTCFullYear() + 100) {
+	while (startDate.getUTCFullYear() < dob.getUTCFullYear() + MAX_YEAR || antarDasha.every(e => date > e.end)) {
 		let endDate = new Date(startDate)
 		endDate.setUTCFullYear(endDate.getUTCFullYear() + 1)
 		endDate.setUTCDate(endDate.getDate() - 1)
-		let value = dob.getUTCDate() + (dob.getUTCMonth() + 1) + (startDate.getUTCFullYear() % 100) + dayLord[startDate.getUTCDay()]
+		let value =
+			dob.getUTCDate() + (dob.getUTCMonth() + 1) + (startDate.getUTCFullYear() % 100) + dayLord[startDate.getUTCDay()]
 		value = value.digit
 		let data: MainData = {
 			start: startDate,
@@ -64,6 +67,11 @@ function getNumerologyChart(dob: Date, date: Date) {
 		if (date >= startDate && date <= endDate) {
 			data.current = true
 			currentAntarDasha = data
+		}
+		// if we remove this logic then it stuck in infinite loop
+		// which happens in case of 1 jan 1997 for example
+		if(endDate.getUTCFullYear() === startDate.getUTCFullYear()) {
+			endDate.setUTCDate(endDate.getUTCDate() + 1)
 		}
 		startDate = new Date(dob)
 		startDate.setUTCFullYear(endDate.getUTCFullYear())
@@ -86,7 +94,10 @@ function getNumerologyChart(dob: Date, date: Date) {
 	let currentMahaDasha: MainData | undefined
 	let count = basic
 	let start = dob.getUTCFullYear()
-	while (dob.getUTCFullYear() + 100 >= start) {
+	// let end = start + count
+	// startDate = new Date(start, dob.getUTCMonth(), dob.getUTCDate())
+	// let endDate = new Date(end, dob.getUTCMonth(), dob.getUTCDate())
+	while (dob.getUTCFullYear() + MAX_YEAR >= start || mahaDasha.every(e => date > e.end)) {
 		let end = start + count
 		let startDate = new Date(start, dob.getUTCMonth(), dob.getUTCDate())
 		let endDate = new Date(end, dob.getUTCMonth(), dob.getUTCDate())
@@ -110,10 +121,10 @@ function getNumerologyChart(dob: Date, date: Date) {
 	}
 
 	// ! Pratyantar dasha
-  /**
-   * @type {{start: Date; end: Date; value: number; current: true}}
-   */
-  let currentPd: PratyantarDashaData | undefined
+	/**
+	 * @type {{start: Date; end: Date; value: number; current: true}}
+	 */
+	let currentPd: PratyantarDashaData | undefined
 	const pdValue = (n: number) => Math.round(n * 8.11)
 	let pdDate = new Date(currentAntarDasha!.start)
 	let nextBirthday = new Date(pdDate)
@@ -124,20 +135,20 @@ function getNumerologyChart(dob: Date, date: Date) {
 		let backup = new Date(pdDate)
 		pdDate.setUTCDate(pdDate.getUTCDate() + pdValue(pd))
 		if (pdDate <= nextBirthday) {
-      let start = backup
-      let end = new Date(pdDate)
+			let start = backup
+			let end = new Date(pdDate)
 			end.setUTCDate(end.getUTCDate() - 1)
-      let data: PratyantarDashaData = {
+			let data: PratyantarDashaData = {
 				start,
 				end,
 				pd: pd,
-				pdValue: pdValue(pd),
+				pdValue: pdValue(pd)
 			}
-      if(date >= start && date <= end) {
-        data.current = true
-        currentPd = data
-      }
-      pratyantarDasha.push(data)
+			if (date >= start && date <= end) {
+				data.current = true
+				currentPd = data
+			}
+			pratyantarDasha.push(data)
 		}
 		if (pd === 9) {
 			pd = 1
@@ -151,7 +162,7 @@ function getNumerologyChart(dob: Date, date: Date) {
 	const grid1: Record<number, string> = { 1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '', 8: '', 9: '' }
 	const grid2: Record<number, string> = { 1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '', 8: '', 9: '' }
 	let gridUpdate = (digit: number, grid: Record<number, string> = grid1, color?: string) => {
-		if(color) {
+		if (color) {
 			if (digit > 0) {
 				grid[position[digit]] += `<span style="color: ${color};">${digit}</span>`
 			}
@@ -169,7 +180,7 @@ function getNumerologyChart(dob: Date, date: Date) {
 	gridUpdate(Math.floor(month / 10))
 	gridUpdate(month % 10)
 	let year = dob.getUTCFullYear()
-	gridUpdate(Math.floor(year % 100 / 10))
+	gridUpdate(Math.floor((year % 100) / 10))
 	gridUpdate(year % 10)
 	if (day > 10 && day % 10 !== 0) {
 		gridUpdate(basic)
@@ -183,14 +194,25 @@ function getNumerologyChart(dob: Date, date: Date) {
 	if (currentAntarDasha) {
 		gridUpdate(currentAntarDasha.value, grid2, '#f2670d')
 	}
-  if(currentPd) {
-    gridUpdate(currentPd.pd, grid2, '#598da6')
-  }
+	if (currentPd) {
+		gridUpdate(currentPd.pd, grid2, '#598da6')
+	}
 
-	return { basic, destiny, currentMahaDasha, mahaDasha, currentAntarDasha, antarDasha, currentPd, pratyantarDasha, grid1, grid2 }
+	return {
+		basic,
+		destiny,
+		currentMahaDasha,
+		mahaDasha,
+		currentAntarDasha,
+		antarDasha,
+		currentPd,
+		pratyantarDasha,
+		grid1,
+		grid2
+	}
 }
 
-export default getNumerologyChart;
+export default getNumerologyChart
 
 // console.log(getNumerologyChart(new Date(1996, 0, 10), new Date(2025, 1, 28))) // 10/01/1996, 2025
 // console.log(getNumerologyChart(new Date(2002, 9, 24), 2025)) // 24/10/2002, 2025

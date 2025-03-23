@@ -36,11 +36,17 @@ onMounted(async () => {
 
 async function calculate() {
   try {
+    chart.value = undefined
     const { valid } = await form.value.validate()
     if (!valid) {
       return
     }
-    chart.value = getNumerologyChart(new Date(dob.value), new Date(date.value))
+    const _dob = new Date(dob.value)
+    const _date = new Date(date.value)
+    if(_dob > _date) {
+      return alert('DOB must be less than the date')
+    }
+    chart.value = getNumerologyChart(_dob, _date)
     console.log(chart.value)
   } catch (error) {
     console.error(error)
@@ -60,6 +66,7 @@ function readable(date: Date): string {
     <div class="d-flex justify-between align-center mt-5">
       <h1>Numerology</h1>
     </div>
+
     <v-card shadow="xl" class="mt-5" elevation="6">
       <v-form ref="form" class="mx-auto mt-8 pa-4" style="max-width: 600px;">
         <h2 v-if="name" class="mb-4">{{ name }}</h2>
@@ -73,7 +80,7 @@ function readable(date: Date): string {
           :rules="[e => !!e || 'Month is required']" variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
 
           <v-text-field v-model="dobYear" label="Year" placeholder="Year"
-          :rules="[e => !!e || 'Year is required',  e => +e <= new Date().getFullYear() || 'Can\'t be future year']" variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
+          :rules="[e => !!e || 'Year is required']" variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
         </div>
 
         <p class="mt-0 mb-2">Date:</p>
@@ -85,10 +92,11 @@ function readable(date: Date): string {
           :rules="[e => !!e || 'Month is required']" variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
 
           <v-text-field v-model="dateYear" label="Year" placeholder="Year"
-          :rules="[e => !!e || 'Year is required']" variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
+          :rules="[e => !!e || 'Year is required', e => +dobYear <= +e || 'Must be greater than or equal to DOB year']" variant="outlined" color="red" density="compact" class="mb-4 d-inline-block" type="number"></v-text-field>
         </div>
 
         <div class="d-flex justify-end">
+          <v-btn class="bg-red text-white px-6 me-3" @click="chart = undefined">reset</v-btn>
           <v-btn class="bg-red text-white px-10" @click="calculate">calculate</v-btn>
         </div>
       </v-form>
